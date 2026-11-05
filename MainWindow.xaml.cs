@@ -66,7 +66,7 @@ public partial class MainWindow : Window
         AddAnimalNavButton.Visibility = IsAdmin || IsVolunteer
             ? Visibility.Visible : Visibility.Collapsed;
 
-        RequestsNavButton.IsEnabled = _currentUser is not null;
+        RequestsNavButton.IsEnabled = true;
         RefreshRequestList();
     }
 
