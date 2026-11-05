@@ -18,7 +18,7 @@ public partial class LoginPage : ContentPage
 
         if (user is null)
         {
-            await DisplayAlert("Ошибка", "Неверный логин или пароль", "OK");
+            await DisplayAlert("Ошибка", "Неверный логин или пароль.", "ОК");
             return;
         }
 
