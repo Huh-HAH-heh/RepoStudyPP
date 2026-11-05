@@ -6,9 +6,11 @@
 - главная страница учебных работ;
 - приложение для учёта животных в приюте.
 
-## Запуск
+## Что установить
 
-Нужен .NET 10 SDK.
+В Visual Studio Installer выберите рабочую нагрузку **ASP.NET and web development**. Также нужен .NET 10 SDK. Рабочая нагрузка .NET MAUI больше не требуется.
+
+## Запуск
 
 Из папки проекта:
 
@@ -17,7 +19,7 @@ dotnet restore
 dotnet run
 ```
 
-В Visual Studio откройте файл `RepoStudyPP.csproj` и запустите проект. Локальный адрес: `http://localhost:5080`.
+В Visual Studio откройте файл `RepoStudyPP.csproj` и запустите профиль `http`. Локальный адрес: `http://localhost:5080`.
 
 ## Тестовые учётные записи
 
