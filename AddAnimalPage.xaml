@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="StudyMauiApp.AddAnimalPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Регистрация животного"
+    BackgroundColor="#F4F6F8">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Style x:Key="InputFieldBorder" TargetType="Border">
+                <Setter Property="Stroke" Value="#E0E5EA" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 6" />
+                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+                <Setter Property="HeightRequest" Value="44" />
+                <Setter Property="Padding" Value="10,0" />
+            </Style>
+
+            <Style x:Key="InputEntry" TargetType="Entry">
+                <Setter Property="TextColor" Value="#20252B" />
+                <Setter Property="PlaceholderColor" Value="#A0AAB5" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="InputDatePicker" TargetType="DatePicker">
+                <Setter Property="TextColor" Value="#20252B" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="16">
+
+            <Border
+                BackgroundColor="White"
+                Stroke="#E0E5EA"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12"
+                Padding="24">
+
+                <VerticalStackLayout Spacing="20">
+
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="Регистрация животного"
+                               FontSize="24"
+                               FontAttributes="Bold"
+                               TextColor="#20252B" />
+
+                        <Label Text="Данные для журнала учета приюта"
+                               TextColor="#69747F"
+                               FontSize="12" />
+                    </VerticalStackLayout>
+
+                    <Grid
+                        ColumnDefinitions="*,*"
+                        RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                        ColumnSpacing="18"
+                        RowSpacing="14">
+
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="5">
+                            <Label Text="Кличка *" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <Entry x:Name="NameEntry"
+                                       Style="{StaticResource InputEntry}"
+                                       Placeholder="Например: Белка" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="5">
+                            <Label Text="Идентификационный номер *" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <Entry x:Name="NumberEntry"
+                                       Style="{StaticResource InputEntry}"
+                                       Placeholder="Например: A-130" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="5">
+                            <Label Text="Вид животного *" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <Entry x:Name="SpeciesEntry"
+                                       Style="{StaticResource InputEntry}"
+                                       Placeholder="Например: Собака" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="5">
+                            <Label Text="Пол *" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <Entry x:Name="GenderEntry"
+                                       Style="{StaticResource InputEntry}"
+                                       Placeholder="Например: Самец" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="2" Grid.Column="0" Spacing="5">
+                            <Label Text="Порода" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <Entry x:Name="BreedEntry"
+                                       Style="{StaticResource InputEntry}"
+                                       Placeholder="Например: лабрадор" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="2" Grid.Column="1" Spacing="5">
+                            <Label Text="Окрас" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <Entry x:Name="ColorEntry"
+                                       Style="{StaticResource InputEntry}"
+                                       Placeholder="Например: рыжий" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="3" Grid.Column="0" Spacing="5">
+                            <Label Text="Размер *" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <Entry x:Name="SizeEntry"
+                                       Style="{StaticResource InputEntry}"
+                                       Placeholder="Например: крупный" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="3" Grid.Column="1" Spacing="5">
+                            <Label Text="Возраст" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <Entry x:Name="AgeEntry"
+                                       Style="{StaticResource InputEntry}"
+                                       Placeholder="Например: 3 года" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="4" Grid.Column="0" Spacing="5">
+                            <Label Text="Вес" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <Entry x:Name="WeightEntry"
+                                       Style="{StaticResource InputEntry}"
+                                       Placeholder="Например: 24 кг"
+                                       Keyboard="Numeric" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="4" Grid.Column="1" Spacing="5">
+                            <Label Text="Дата приемки" FontSize="12" TextColor="#69747F" />
+                            <Border Style="{StaticResource InputFieldBorder}">
+                                <DatePicker x:Name="AdmissionDatePicker"
+                                            Style="{StaticResource InputDatePicker}"
+                                            Format="dd.MM.yyyy" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="5" Grid.ColumnSpan="2" Spacing="5">
+                            <Label Text="Информация о прививках"
+                                   FontSize="12"
+                                   TextColor="#69747F" />
+                            <Border
+                                BackgroundColor="#FFFFFF"
+                                Stroke="#E0E5EA"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 6"
+                                Padding="10">
+                                <Editor x:Name="VaccinationsEditor"
+                                        Placeholder="Какие прививки известны..."
+                                        PlaceholderColor="#A0AAB5"
+                                        TextColor="#20252B"
+                                        BackgroundColor="Transparent"
+                                        AutoSize="TextChanges"
+                                        MinimumHeightRequest="90" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="6" Grid.ColumnSpan="2" Spacing="5">
+                            <Label Text="Фотография"
+                                   FontSize="12"
+                                   TextColor="#69747F" />
+
+                            <Border
+                                BackgroundColor="#F8FAFC"
+                                Stroke="#E3E8ED"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="10">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <Label x:Name="PhotoLabel"
+                                           Text="Фото не выбрано"
+                                           TextColor="#69747F"
+                                           VerticalTextAlignment="Center"
+                                           LineBreakMode="TailTruncation" />
+
+                                    <Button Grid.Column="1"
+                                            Text="Выбрать фото"
+                                            Clicked="OnPickPhotoClicked"
+                                            BackgroundColor="#E9EEF3"
+                                            TextColor="#20252B"
+                                            CornerRadius="8" />
+                                </Grid>
+                            </Border>
+                        </VerticalStackLayout>
+
+                    </Grid>
+
+                    <Label x:Name="ValidationLabel"
+                           IsVisible="False"
+                           TextColor="#D64545"
+                           FontSize="12" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <Button
+                            Text="Отмена"
+                            Clicked="OnCancelClicked"
+                            BackgroundColor="#E9EEF3"
+                            TextColor="#20252B"
+                            CornerRadius="8"
+                            HeightRequest="44" />
+
+                        <Button
+                            Grid.Column="1"
+                            Text="Зарегистрировать"
+                            Clicked="OnSaveClicked"
+                            BackgroundColor="#2F80ED"
+                            TextColor="White"
+                            CornerRadius="8"
+                            HeightRequest="44" />
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
