@@ -1,0 +1,115 @@
+@page "/veterinary"
+@inject UserSession Session
+
+<PageTitle>Ветеринария</PageTitle>
+
+<div class="page-heading">
+    <h1>Ветеринарный журнал</h1>
+    <p>Записи о медицинских процедурах и осмотрах животных.</p>
+</div>
+
+@if (Session.CurrentUser is null)
+{
+    <section class="card">
+        <p>Войдите в систему, чтобы открыть журнал.</p>
+        <a class="button" href="/login">Войти</a>
+    </section>
+}
+else
+{
+    @if (Session.IsVeterinarian)
+    {
+        <section class="card">
+            <h2>Новая запись</h2>
+            <div class="form">
+                <label>Животное</label>
+                <select @bind="SelectedAnimalNumber">
+                    <option value="">Выберите животное</option>
+                    @foreach (var animal in AnimalStore.Animals)
+                    {
+                        <option value="@animal.Number">@animal.DisplayName</option>
+                    }
+                </select>
+                <label>Дата</label>
+                <input type="date" @bind="RecordDate" />
+                <label>Процедура</label>
+                <input @bind="Procedure" placeholder="Например: осмотр или вакцинация" />
+                <label>Примечание</label>
+                <textarea @bind="Notes" rows="3" placeholder="Краткие сведения"></textarea>
+                @if (!string.IsNullOrWhiteSpace(Error))
+                {
+                    <p class="error">@Error</p>
+                }
+                <button class="button" @onclick="SaveRecord">Сохранить запись</button>
+            </div>
+        </section>
+    }
+    else
+    {
+        <p class="muted">Просмотр журнала доступен вошедшим пользователям. Добавлять записи может ветеринар.</p>
+    }
+
+    <section class="card">
+        <h2>Список записей</h2>
+        <p class="muted">Всего: @VeterinaryStore.Records.Count</p>
+        @if (VeterinaryStore.Records.Count == 0)
+        {
+            <p class="muted">Записей пока нет.</p>
+        }
+        else
+        {
+            <div class="record-list">
+                @foreach (var record in VeterinaryStore.Records.OrderByDescending(r => r.Date))
+                {
+                    <article class="record">
+                        <h3>@record.Procedure</h3>
+                        <p>@record.AnimalText</p>
+                        <p class="muted">Дата: @record.DateText</p>
+                        <p>@record.Notes</p>
+                    </article>
+                }
+            </div>
+        }
+    </section>
+}
+
+@code {
+    private string SelectedAnimalNumber { get; set; } = "";
+    private DateTime RecordDate { get; set; } = DateTime.Today;
+    private string Procedure { get; set; } = "";
+    private string Notes { get; set; } = "";
+    private string Error { get; set; } = "";
+
+    private void SaveRecord()
+    {
+        Error = "";
+
+        if (!Session.IsVeterinarian)
+        {
+            Error = "Добавлять записи может только ветеринар.";
+            return;
+        }
+
+        var animal = AnimalStore.Animals.FirstOrDefault(a => a.Number == SelectedAnimalNumber);
+        if (animal is null)
+        {
+            Error = "Выберите животное.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Procedure))
+        {
+            Error = "Укажите процедуру.";
+            return;
+        }
+
+        VeterinaryStore.Records.Add(new VeterinaryItem(
+            animal.Name, animal.Number, Procedure.Trim(), RecordDate,
+            string.IsNullOrWhiteSpace(Notes) ? "Без примечания" : Notes.Trim()));
+
+        SelectedAnimalNumber = "";
+        Procedure = "";
+        Notes = "";
+        RecordDate = DateTime.Today;
+    }
+}

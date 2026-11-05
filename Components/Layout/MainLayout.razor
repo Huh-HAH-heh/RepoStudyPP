@@ -1,0 +1,48 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject UserSession Session
+
+<div class="site">
+    <header class="topbar">
+        <a class="brand" href="/">Учебные работы</a>
+        <nav class="navigation">
+            <NavLink href="/" Match="NavLinkMatch.All">Главная</NavLink>
+            <NavLink href="/shelter">Приют</NavLink>
+            @if (Session.CurrentUser is not null)
+            {
+                <NavLink href="/requests">Заявки</NavLink>
+            }
+            @if (Session.IsVeterinarian)
+            {
+                <NavLink href="/veterinary">Ветеринария</NavLink>
+            }
+            @if (Session.IsAdmin)
+            {
+                <NavLink href="/reports">Отчёт</NavLink>
+            }
+        </nav>
+        <div class="account">
+            @if (Session.CurrentUser is null)
+            {
+                <NavLink class="button button-small" href="/login">Войти</NavLink>
+            }
+            else
+            {
+                <span class="account-name">@Session.CurrentUser.FullName</span>
+                <button class="button button-small button-light" @onclick="Logout">Выйти</button>
+            }
+        </div>
+    </header>
+    <main class="content">@Body</main>
+    <footer class="footer">Учебный проект. Данные примера хранятся в памяти приложения.</footer>
+</div>
+
+@code {
+    protected override void OnInitialized() => Session.Changed += Refresh;
+
+    private void Refresh() => _ = InvokeAsync(StateHasChanged);
+
+    private void Logout() => Session.Logout();
+
+    public void Dispose() => Session.Changed -= Refresh;
+}

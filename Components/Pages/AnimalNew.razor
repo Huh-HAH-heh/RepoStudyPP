@@ -1,0 +1,103 @@
+@page "/animals/new"
+@inject UserSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>Добавить животное</PageTitle>
+
+<div class="narrow-page">
+    <section class="card">
+        <h1>Добавить животное</h1>
+        <p class="muted">Заполните основные сведения для журнала приюта.</p>
+
+        @if (!CanAdd)
+        {
+            <p class="error">Добавлять животных могут администратор и волонтёр.</p>
+            <a class="button button-light" href="/shelter">Вернуться к приюту</a>
+        }
+        else
+        {
+            <div class="form">
+                <label>Кличка *</label>
+                <input @bind="Name" placeholder="Например: Белка" />
+                <label>Номер *</label>
+                <input @bind="Number" placeholder="Например: A-130" />
+                <label>Вид животного *</label>
+                <select @bind="Species">
+                    <option value="Собака">Собака</option>
+                    <option value="Кошка">Кошка</option>
+                    <option value="Другое">Другое</option>
+                </select>
+                <label>Пол *</label>
+                <select @bind="Gender">
+                    <option value="Самка">Самка</option>
+                    <option value="Самец">Самец</option>
+                </select>
+                <label>Порода</label>
+                <input @bind="Breed" placeholder="Можно не заполнять" />
+                <label>Размер *</label>
+                <select @bind="Size">
+                    <option value="Маленький">Маленький</option>
+                    <option value="Средний">Средний</option>
+                    <option value="Крупный">Крупный</option>
+                </select>
+                <label>Дата поступления</label>
+                <input type="date" @bind="AdmissionDate" />
+
+                @if (!string.IsNullOrWhiteSpace(Error))
+                {
+                    <p class="error">@Error</p>
+                }
+
+                <div class="action-row">
+                    <a class="button button-light" href="/shelter">Отмена</a>
+                    <button class="button" @onclick="Save">Сохранить</button>
+                </div>
+            </div>
+        }
+    </section>
+</div>
+
+@code {
+    private string Name { get; set; } = "";
+    private string Number { get; set; } = "";
+    private string Species { get; set; } = "Собака";
+    private string Gender { get; set; } = "Самка";
+    private string Breed { get; set; } = "";
+    private string Size { get; set; } = "Средний";
+    private DateTime AdmissionDate { get; set; } = DateTime.Today;
+    private string Error { get; set; } = "";
+
+    private bool CanAdd => Session.IsAdmin || Session.IsVolunteer;
+
+    private void Save()
+    {
+        Error = "";
+
+        if (!CanAdd)
+        {
+            Error = "Нет доступа.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Number))
+        {
+            Error = "Укажите кличку и номер животного.";
+            return;
+        }
+
+        if (AnimalStore.Animals.Any(a =>
+            a.Number.Equals(Number.Trim(), StringComparison.OrdinalIgnoreCase)))
+        {
+            Error = "Животное с таким номером уже есть в списке.";
+            return;
+        }
+
+        AnimalStore.Animals.Add(new AnimalItem(
+            Name.Trim(), Number.Trim(), Species,
+            string.IsNullOrWhiteSpace(Breed) ? "Не указана" : Breed.Trim(),
+            Gender, "Не указан", Size, "Не указан", "Не указан",
+            "Не указаны", "В приюте", "Не прикреплено"));
+
+        Navigation.NavigateTo("/shelter");
+    }
+}

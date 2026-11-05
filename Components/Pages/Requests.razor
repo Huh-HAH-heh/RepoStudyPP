@@ -1,0 +1,210 @@
+@page "/requests"
+@inject UserSession Session
+
+<PageTitle>Заявки</PageTitle>
+
+<div class="page-heading">
+    <h1>Заявки</h1>
+    <p>Заявки на передачу и приём животных.</p>
+</div>
+
+@if (Session.CurrentUser is null)
+{
+    <section class="card">
+        <p>Чтобы работать с заявками, войдите в систему.</p>
+        <a class="button" href="/login">Войти</a>
+    </section>
+}
+else
+{
+    @if (Session.IsClient)
+    {
+        <section class="card">
+            <h2>Новая заявка</h2>
+            <div class="form">
+                <label>Тип заявки</label>
+                <select @bind="RequestKind">
+                    <option value="adoption">Взять животное в семью</option>
+                    <option value="surrender">Передать животное в приют</option>
+                </select>
+
+                @if (RequestKind == "adoption")
+                {
+                    <label>Питомец</label>
+                    <select @bind="SelectedAnimalNumber">
+                        <option value="">Выберите животное</option>
+                        @foreach (var animal in AvailableAnimals)
+                        {
+                            <option value="@animal.Number">@animal.DisplayName</option>
+                        }
+                    </select>
+                }
+                else
+                {
+                    <label>Описание животного</label>
+                    <textarea @bind="AnimalDescription" rows="3"
+                              placeholder="Вид, примерный возраст и другие сведения"></textarea>
+                }
+
+                <label>Дата заявки</label>
+                <input type="date" @bind="RequestDate" />
+
+                @if (!string.IsNullOrWhiteSpace(Error))
+                {
+                    <p class="error">@Error</p>
+                }
+
+                <button class="button" @onclick="CreateRequest">Оформить заявку</button>
+            </div>
+        </section>
+    }
+    else if (Session.IsAdmin || Session.IsVolunteer)
+    {
+        <p class="muted">Вы вошли как сотрудник приюта. Здесь можно просматривать заявки и оформлять выдачу животных.</p>
+    }
+    else
+    {
+        <p class="muted">Ваша учётная запись не имеет доступа к этому разделу.</p>
+    }
+
+    <section class="card">
+        <h2>Журнал заявок</h2>
+        <p class="muted">Всего: @VisibleRequests.Count</p>
+
+        @if (VisibleRequests.Count == 0)
+        {
+            <p class="muted">Заявок пока нет.</p>
+        }
+        else
+        {
+            <div class="record-list">
+                @foreach (var request in VisibleRequests)
+                {
+                    <article class="record">
+                        <div class="section-heading">
+                            <h3>Заявка №@request.Id — @request.Type</h3>
+                            <span class="status">@request.Status</span>
+                        </div>
+                        <p><b>Клиент:</b> @request.ClientName</p>
+                        <p><b>Телефон:</b> @request.Phone</p>
+                        <p>@request.AnimalText</p>
+                        <p class="muted">Дата: @request.DateText</p>
+                        @if (CanProcess(request))
+                        {
+                            <button class="button button-small" @onclick="() => ProcessRequest(request)">
+                                Оформить выдачу
+                            </button>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </section>
+}
+
+@code {
+    private string RequestKind { get; set; } = "adoption";
+    private string SelectedAnimalNumber { get; set; } = "";
+    private string AnimalDescription { get; set; } = "";
+    private DateTime RequestDate { get; set; } = DateTime.Today;
+    private string Error { get; set; } = "";
+
+    private List<AnimalItem> AvailableAnimals =>
+        AnimalStore.Animals.Where(a => a.Status != "На лечении").ToList();
+
+    private List<RequestItem> VisibleRequests
+    {
+        get
+        {
+            IEnumerable<RequestItem> result = RequestStore.Requests;
+
+            if (Session.IsClient && Session.CurrentUser is not null)
+            {
+                result = result.Where(r =>
+                    r.ClientName.Equals(Session.CurrentUser.FullName, StringComparison.OrdinalIgnoreCase) ||
+                    r.Phone.Equals(Session.CurrentUser.Phone, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return result.OrderByDescending(r => r.Date)
+                         .ThenByDescending(r => r.Id)
+                         .ToList();
+        }
+    }
+
+    private void CreateRequest()
+    {
+        Error = "";
+
+        if (!Session.IsClient || Session.CurrentUser is null)
+        {
+            Error = "Оформить заявку может только клиент.";
+            return;
+        }
+
+        string animalNumber = "";
+        string animalName = "";
+        string description = "";
+
+        if (RequestKind == "adoption")
+        {
+            var animal = AvailableAnimals.FirstOrDefault(a => a.Number == SelectedAnimalNumber);
+            if (animal is null)
+            {
+                Error = "Выберите животное.";
+                return;
+            }
+
+            animalNumber = animal.Number;
+            animalName = animal.Name;
+        }
+        else
+        {
+            description = AnimalDescription.Trim();
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                Error = "Опишите животное, которое хотите передать в приют.";
+                return;
+            }
+        }
+
+        int id = RequestStore.Requests.Count == 0
+            ? 1
+            : RequestStore.Requests.Max(r => r.Id) + 1;
+
+        RequestStore.Requests.Add(new RequestItem
+        {
+            Id = id,
+            ClientName = Session.CurrentUser.FullName,
+            Phone = Session.CurrentUser.Phone,
+            TypeValue = RequestKind == "adoption" ? RequestType.Adoption : RequestType.Surrender,
+            AnimalNumber = animalNumber,
+            AnimalName = animalName,
+            AnimalDescription = description,
+            Date = RequestDate
+        });
+
+        SelectedAnimalNumber = "";
+        AnimalDescription = "";
+    }
+
+    private bool CanProcess(RequestItem request) =>
+        (Session.IsAdmin || Session.IsVolunteer) &&
+        request.TypeValue == RequestType.Adoption &&
+        request.Status == "Новая";
+
+    private void ProcessRequest(RequestItem request)
+    {
+        if (!CanProcess(request))
+            return;
+
+        var animal = AnimalStore.Animals.FirstOrDefault(a =>
+            a.Number.Equals(request.AnimalNumber, StringComparison.OrdinalIgnoreCase));
+
+        if (animal is null || animal.Status == "На лечении")
+            return;
+
+        AnimalStore.Animals.Remove(animal);
+        AnimalStore.AdoptedCount++;
+        request.Status = "Выдано в семью";
+    }
+}
