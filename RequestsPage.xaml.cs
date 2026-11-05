@@ -13,7 +13,6 @@ public partial class RequestsPage : ContentPage
         InitializeComponent();
 
         RequestDatePicker.Date = DateTime.Today;
-
         LoadClientData();
         LoadAvailableAnimals();
         ApplyRoleUi();
@@ -40,17 +39,16 @@ public partial class RequestsPage : ContentPage
         CreateRequestCard.IsVisible = isClient;
 
         if (isClient)
-            PageSubtitle.Text = "Оформление заявки на прием или взятие питомца в семью.";
+            PageSubtitle.Text = "Оформление заявки на передачу или приём животного.";
         else if (isEmployee)
-            PageSubtitle.Text = "Просмотр заявок и оформление выдачи питомца в семью.";
+            PageSubtitle.Text = "Просмотр заявок и оформление выдачи животных.";
         else
-            PageSubtitle.Text = "Раздел заявок доступен клиентам и сотрудникам приюта.";
+            PageSubtitle.Text = "Для работы с заявками войдите в систему.";
     }
 
     private void LoadClientData()
     {
         var user = SessionObject.CurrentUser;
-
         ClientNameEntry.Text = user?.FullName ?? "";
         PhoneEntry.Text = user?.Phone ?? "";
     }
@@ -70,13 +68,13 @@ public partial class RequestsPage : ContentPage
             var button = new Button
             {
                 Text = animal.DisplayName,
-                BackgroundColor = Color.FromArgb("#F8FAFC"),
-                TextColor = Color.FromArgb("#20252B"),
-                BorderColor = Color.FromArgb("#E0E5EA"),
+                BackgroundColor = Color.FromArgb("#F7F8F8"),
+                TextColor = Color.FromArgb("#252525"),
+                BorderColor = Color.FromArgb("#D6D6D6"),
                 BorderWidth = 1,
-                CornerRadius = 8,
-                HeightRequest = 42,
-                Padding = new Thickness(12, 6)
+                CornerRadius = 4,
+                HeightRequest = 40,
+                Padding = new Thickness(10, 6)
             };
 
             button.Clicked += (_, _) => SelectAnimal(animal, button);
@@ -87,10 +85,9 @@ public partial class RequestsPage : ContentPage
         {
             AnimalOptions.Children.Add(new Label
             {
-                Text = "Нет доступных питомцев.",
-                TextColor = Color.FromArgb("#69747F"),
-                FontSize = 12,
-                Padding = new Thickness(4)
+                Text = "Нет доступных животных.",
+                TextColor = Color.FromArgb("#666666"),
+                FontSize = 12
             });
         }
     }
@@ -99,15 +96,15 @@ public partial class RequestsPage : ContentPage
     {
         foreach (var child in AnimalOptions.Children.OfType<Button>())
         {
-            child.BackgroundColor = Color.FromArgb("#F8FAFC");
-            child.TextColor = Color.FromArgb("#20252B");
+            child.BackgroundColor = Color.FromArgb("#F7F8F8");
+            child.TextColor = Color.FromArgb("#252525");
         }
 
-        selectedButton.BackgroundColor = Color.FromArgb("#2F80ED");
+        selectedButton.BackgroundColor = Color.FromArgb("#456C83");
         selectedButton.TextColor = Colors.White;
 
         _selectedAnimal = animal;
-        SelectedAnimalLabel.Text = $"Выбран: {animal.Name} ({animal.Number})";
+        SelectedAnimalLabel.Text = $"Выбрано: {animal.Name} ({animal.Number})";
     }
 
     private void OnAdoptionTypeClicked(object? sender, EventArgs e)
@@ -129,22 +126,15 @@ public partial class RequestsPage : ContentPage
         AdoptionFields.IsVisible = adoption;
         SurrenderFields.IsVisible = !adoption;
 
-        if (adoption)
-        {
-            AdoptionTypeButton.BackgroundColor = Color.FromArgb("#2F80ED");
-            AdoptionTypeButton.TextColor = Colors.White;
+        AdoptionTypeButton.BackgroundColor = adoption
+            ? Color.FromArgb("#456C83")
+            : Color.FromArgb("#E1E4E5");
+        AdoptionTypeButton.TextColor = adoption ? Colors.White : Color.FromArgb("#252525");
 
-            SurrenderTypeButton.BackgroundColor = Color.FromArgb("#E9EEF3");
-            SurrenderTypeButton.TextColor = Color.FromArgb("#20252B");
-        }
-        else
-        {
-            AdoptionTypeButton.BackgroundColor = Color.FromArgb("#E9EEF3");
-            AdoptionTypeButton.TextColor = Color.FromArgb("#20252B");
-
-            SurrenderTypeButton.BackgroundColor = Color.FromArgb("#2F80ED");
-            SurrenderTypeButton.TextColor = Colors.White;
-        }
+        SurrenderTypeButton.BackgroundColor = adoption
+            ? Color.FromArgb("#E1E4E5")
+            : Color.FromArgb("#456C83");
+        SurrenderTypeButton.TextColor = adoption ? Color.FromArgb("#252525") : Colors.White;
     }
 
     private void LoadRequests()
@@ -178,10 +168,7 @@ public partial class RequestsPage : ContentPage
 
         if (!SessionObject.IsClient)
         {
-            await DisplayAlert(
-                "Нет доступа",
-                "Заявку на прием или взятие животного оформляет клиент.",
-                "ОК");
+            await DisplayAlert("Нет доступа", "Заявку может оформить клиент.", "ОК");
             return;
         }
 
@@ -201,7 +188,7 @@ public partial class RequestsPage : ContentPage
         {
             if (_selectedAnimal is null)
             {
-                ValidationLabel.Text = "Выберите питомца, которого хотите взять в семью.";
+                ValidationLabel.Text = "Выберите животное.";
                 ValidationLabel.IsVisible = true;
                 return;
             }
@@ -215,7 +202,7 @@ public partial class RequestsPage : ContentPage
 
             if (string.IsNullOrWhiteSpace(animalDescription))
             {
-                ValidationLabel.Text = "Опишите животное, которое хотите передать в приют.";
+                ValidationLabel.Text = "Опишите животное.";
                 ValidationLabel.IsVisible = true;
                 return;
             }
@@ -238,10 +225,7 @@ public partial class RequestsPage : ContentPage
                 Date = RequestDatePicker.Date
             });
 
-        await DisplayAlert(
-            "Заявка оформлена",
-            $"Заявка №{id} зарегистрирована.",
-            "ОК");
+        await DisplayAlert("Заявка оформлена", $"Заявка №{id} сохранена.", "ОК");
 
         SurrenderAnimalEntry.Text = "";
         LoadAvailableAnimals();
@@ -252,10 +236,7 @@ public partial class RequestsPage : ContentPage
     {
         if (!SessionObject.IsAdmin && !SessionObject.IsVolonteer)
         {
-            await DisplayAlert(
-                "Нет доступа",
-                "Оформить выдачу могут администратор и волонтер.",
-                "ОК");
+            await DisplayAlert("Нет доступа", "Оформить выдачу могут администратор и волонтер.", "ОК");
             return;
         }
 
@@ -263,25 +244,18 @@ public partial class RequestsPage : ContentPage
             button.CommandParameter is not RequestItem request)
             return;
 
-        var animal = AnimalStore.Animals
-            .FirstOrDefault(a =>
-                a.Number.Equals(request.AnimalNumber, StringComparison.OrdinalIgnoreCase));
+        var animal = AnimalStore.Animals.FirstOrDefault(a =>
+            a.Number.Equals(request.AnimalNumber, StringComparison.OrdinalIgnoreCase));
 
         if (animal is null)
         {
-            await DisplayAlert(
-                "Ошибка",
-                "Питомец из заявки не найден в журнале.",
-                "ОК");
+            await DisplayAlert("Ошибка", "Животное из заявки не найдено.", "ОК");
             return;
         }
 
         if (animal.Status == "На лечении")
         {
-            await DisplayAlert(
-                "Нельзя оформить выдачу",
-                "Животное находится на лечении.",
-                "ОК");
+            await DisplayAlert("Нельзя оформить выдачу", "Животное находится на лечении.", "ОК");
             return;
         }
 
@@ -298,11 +272,7 @@ public partial class RequestsPage : ContentPage
         AnimalStore.AdoptedCount++;
         request.Status = "Выдано в семью";
 
-        await DisplayAlert(
-            "Готово",
-            $"Животное «{animal.Name}» выдано в семью.",
-            "ОК");
-
+        await DisplayAlert("Готово", "Животное передано в семью.", "ОК");
         LoadRequests();
     }
 

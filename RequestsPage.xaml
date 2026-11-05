@@ -4,291 +4,177 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Заявки"
-    BackgroundColor="#F4F6F8">
-
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <Style x:Key="RequestInputBorder" TargetType="Border">
-                <Setter Property="Stroke" Value="#E0E5EA" />
-                <Setter Property="StrokeThickness" Value="1" />
-                <Setter Property="StrokeShape" Value="RoundRectangle 6" />
-                <Setter Property="BackgroundColor" Value="#FFFFFF" />
-                <Setter Property="HeightRequest" Value="44" />
-                <Setter Property="Padding" Value="10,0" />
-            </Style>
-
-            <Style x:Key="RequestEntry" TargetType="Entry">
-                <Setter Property="TextColor" Value="#20252B" />
-                <Setter Property="PlaceholderColor" Value="#A0AAB5" />
-                <Setter Property="BackgroundColor" Value="Transparent" />
-                <Setter Property="VerticalOptions" Value="Center" />
-            </Style>
-        </ResourceDictionary>
-    </ContentPage.Resources>
+    BackgroundColor="#F3F4F4">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="16">
-
+        <VerticalStackLayout Padding="16" Spacing="14">
             <VerticalStackLayout Spacing="3">
                 <Label Text="Заявки"
-                       FontSize="24"
-                       FontAttributes="Bold" />
+                       FontSize="23"
+                       FontAttributes="Bold"
+                       TextColor="#252525" />
                 <Label x:Name="PageSubtitle"
-                       Text="Заявки на прием и передачу животных"
-                       TextColor="#69747F"
-                       FontSize="12" />
+                       Text="Заявки на передачу и приём животных."
+                       FontSize="13"
+                       TextColor="#666666" />
             </VerticalStackLayout>
 
             <Border x:Name="CreateRequestCard"
                     BackgroundColor="White"
-                    Stroke="#E0E5EA"
+                    Stroke="#D6D6D6"
                     StrokeThickness="1"
-                    StrokeShape="RoundRectangle 12"
-                    Padding="20">
-
-                <VerticalStackLayout Spacing="14">
-
+                    StrokeShape="RoundRectangle 5"
+                    Padding="16">
+                <VerticalStackLayout Spacing="10">
                     <Label Text="Новая заявка"
                            FontSize="18"
-                           FontAttributes="Bold" />
+                           FontAttributes="Bold"
+                           TextColor="#252525" />
 
-                    <Grid RowDefinitions="Auto,Auto,Auto,Auto"
-                          ColumnDefinitions="*,*"
-                          ColumnSpacing="16"
-                          RowSpacing="12">
+                    <Label Text="ФИО клиента" FontSize="13" TextColor="#555555" />
+                    <Entry x:Name="ClientNameEntry" IsReadOnly="True" />
 
-                        <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="4">
-                            <Label Text="ФИО клиента"
-                                   FontSize="12"
-                                   TextColor="#69747F" />
-                            <Border Style="{StaticResource RequestInputBorder}">
-                                <Entry x:Name="ClientNameEntry"
-                                       Style="{StaticResource RequestEntry}"
-                                       IsReadOnly="True" />
-                            </Border>
-                        </VerticalStackLayout>
+                    <Label Text="Телефон" FontSize="13" TextColor="#555555" />
+                    <Entry x:Name="PhoneEntry" IsReadOnly="True" />
 
-                        <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="4">
-                            <Label Text="Номер телефона"
-                                   FontSize="12"
-                                   TextColor="#69747F" />
-                            <Border Style="{StaticResource RequestInputBorder}">
-                                <Entry x:Name="PhoneEntry"
-                                       Style="{StaticResource RequestEntry}"
-                                       IsReadOnly="True" />
-                            </Border>
-                        </VerticalStackLayout>
-
-                        <VerticalStackLayout Grid.Row="1"
-                                             Grid.ColumnSpan="2"
-                                             Spacing="6">
-                            <Label Text="Тип заявки"
-                                   FontSize="12"
-                                   TextColor="#69747F" />
-
-                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                                <Button x:Name="AdoptionTypeButton"
-                                        Text="Взять в семью"
-                                        Clicked="OnAdoptionTypeClicked"
-                                        BackgroundColor="#2F80ED"
-                                        TextColor="White"
-                                        CornerRadius="8"
-                                        HeightRequest="42" />
-
-                                <Button Grid.Column="1"
-                                        x:Name="SurrenderTypeButton"
-                                        Text="Сдать в приют"
-                                        Clicked="OnSurrenderTypeClicked"
-                                        BackgroundColor="#E9EEF3"
-                                        TextColor="#20252B"
-                                        CornerRadius="8"
-                                        HeightRequest="42" />
-                            </Grid>
-                        </VerticalStackLayout>
-
-                        <VerticalStackLayout x:Name="AdoptionFields"
-                                             Grid.Row="2"
-                                             Grid.ColumnSpan="2"
-                                             Spacing="6">
-                            <Label Text="Питомец"
-                                   FontSize="12"
-                                   TextColor="#69747F" />
-
-                            <Border
-                                BackgroundColor="#FFFFFF"
-                                Stroke="#E0E5EA"
-                                StrokeThickness="1"
-                                StrokeShape="RoundRectangle 8"
-                                Padding="10">
-
-                                <VerticalStackLayout x:Name="AnimalOptions"
-                                                     Spacing="8" />
-
-                            </Border>
-
-                            <Label x:Name="SelectedAnimalLabel"
-                                   Text="Питомец не выбран"
-                                   TextColor="#69747F"
-                                   FontSize="12" />
-                        </VerticalStackLayout>
-
-                        <VerticalStackLayout x:Name="SurrenderFields"
-                                             Grid.Row="2"
-                                             Grid.ColumnSpan="2"
-                                             Spacing="6"
-                                             IsVisible="False">
-                            <Label Text="Информация о животном"
-                                   FontSize="12"
-                                   TextColor="#69747F" />
-
-                            <Border
-                                BackgroundColor="#FFFFFF"
-                                Stroke="#E0E5EA"
-                                StrokeThickness="1"
-                                StrokeShape="RoundRectangle 6"
-                                Padding="10">
-
-                                <Editor x:Name="SurrenderAnimalEntry"
-                                        Placeholder="Например: собака, метис, самец, около 4 лет"
-                                        PlaceholderColor="#A0AAB5"
-                                        TextColor="#20252B"
-                                        BackgroundColor="Transparent"
-                                        AutoSize="TextChanges"
-                                        MinimumHeightRequest="90" />
-
-                            </Border>
-                        </VerticalStackLayout>
-
-                        <VerticalStackLayout Grid.Row="3"
-                                             Grid.ColumnSpan="2"
-                                             Spacing="4">
-                            <Label Text="Дата оформления"
-                                   FontSize="12"
-                                   TextColor="#69747F" />
-
-                            <Border Style="{StaticResource RequestInputBorder}">
-                                <DatePicker x:Name="RequestDatePicker"
-                                            TextColor="#20252B"
-                                            BackgroundColor="Transparent"
-                                            VerticalOptions="Center"
-                                            Format="dd.MM.yyyy" />
-                            </Border>
-                        </VerticalStackLayout>
-
+                    <Label Text="Тип заявки" FontSize="13" TextColor="#555555" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Button x:Name="AdoptionTypeButton"
+                                Text="Взять в семью"
+                                Clicked="OnAdoptionTypeClicked"
+                                BackgroundColor="#456C83"
+                                TextColor="White"
+                                CornerRadius="4"
+                                HeightRequest="42" />
+                        <Button Grid.Column="1"
+                                x:Name="SurrenderTypeButton"
+                                Text="Передать в приют"
+                                Clicked="OnSurrenderTypeClicked"
+                                BackgroundColor="#E1E4E5"
+                                TextColor="#252525"
+                                CornerRadius="4"
+                                HeightRequest="42" />
                     </Grid>
+
+                    <VerticalStackLayout x:Name="AdoptionFields" Spacing="6">
+                        <Label Text="Выберите питомца" FontSize="13" TextColor="#555555" />
+                        <VerticalStackLayout x:Name="AnimalOptions" Spacing="6" />
+                        <Label x:Name="SelectedAnimalLabel"
+                               Text="Питомец не выбран"
+                               FontSize="12"
+                               TextColor="#666666" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout x:Name="SurrenderFields"
+                                         Spacing="6"
+                                         IsVisible="False">
+                        <Label Text="Опишите животное" FontSize="13" TextColor="#555555" />
+                        <Editor x:Name="SurrenderAnimalEntry"
+                                Placeholder="Вид, примерный возраст и другие сведения"
+                                AutoSize="TextChanges"
+                                MinimumHeightRequest="80" />
+                    </VerticalStackLayout>
+
+                    <Label Text="Дата заявки" FontSize="13" TextColor="#555555" />
+                    <DatePicker x:Name="RequestDatePicker"
+                                Format="dd.MM.yyyy" />
 
                     <Label x:Name="ValidationLabel"
                            IsVisible="False"
-                           TextColor="#D64545"
+                           TextColor="#B33A3A"
                            FontSize="12" />
 
                     <Button Text="Оформить заявку"
                             Clicked="OnCreateRequestClicked"
-                            BackgroundColor="#2F80ED"
+                            BackgroundColor="#456C83"
                             TextColor="White"
-                            CornerRadius="8"
-                            HeightRequest="44" />
-
+                            CornerRadius="4"
+                            HeightRequest="42" />
                 </VerticalStackLayout>
             </Border>
 
-            <Border
-                BackgroundColor="White"
-                Stroke="#E0E5EA"
-                StrokeThickness="1"
-                StrokeShape="RoundRectangle 12"
-                Padding="20">
-
-                <VerticalStackLayout Spacing="12">
-
+            <Border BackgroundColor="White"
+                    Stroke="#D6D6D6"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 5"
+                    Padding="16">
+                <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="*,Auto">
                         <VerticalStackLayout Spacing="2">
                             <Label Text="Журнал заявок"
                                    FontSize="18"
-                                   FontAttributes="Bold" />
+                                   FontAttributes="Bold"
+                                   TextColor="#252525" />
                             <Label x:Name="RequestsCountLabel"
-                                   Style="{StaticResource Muted}" />
+                                   FontSize="12"
+                                   TextColor="#666666" />
                         </VerticalStackLayout>
-
                         <Button Grid.Column="1"
                                 Text="Назад"
                                 Clicked="OnBackClicked"
-                                BackgroundColor="#E9EEF3"
-                                TextColor="#20252B"
-                                CornerRadius="8" />
+                                BackgroundColor="#E1E4E5"
+                                TextColor="#252525"
+                                CornerRadius="4" />
                     </Grid>
 
                     <CollectionView x:Name="RequestsView"
                                     SelectionMode="None">
                         <CollectionView.EmptyView>
                             <Label Text="Заявок пока нет."
-                                   TextColor="#69747F"
+                                   TextColor="#666666"
                                    HorizontalTextAlignment="Center"
-                                   Margin="0,20" />
+                                   Margin="0,18" />
                         </CollectionView.EmptyView>
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Border
-                                    Margin="0,0,0,10"
-                                    Padding="14"
-                                    BackgroundColor="#F8FAFC"
-                                    Stroke="#E3E8ED"
-                                    StrokeShape="RoundRectangle 8">
-
-                                    <Grid ColumnDefinitions="*,Auto"
-                                          ColumnSpacing="12"
-                                          RowDefinitions="Auto,Auto,Auto,Auto">
-
+                                <Border Margin="0,0,0,8"
+                                        Padding="10"
+                                        BackgroundColor="#F7F8F8"
+                                        Stroke="#DDDDDD"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 4">
+                                    <VerticalStackLayout Spacing="4">
                                         <Label Text="{Binding Type}"
                                                FontSize="14"
-                                               FontAttributes="Bold" />
-
-                                        <Label Grid.Column="1"
-                                               Text="{Binding Status}"
-                                               TextColor="#2F80ED"
                                                FontAttributes="Bold"
-                                               FontSize="11"
-                                               HorizontalTextAlignment="End" />
-
-                                        <Label Grid.Row="1"
-                                               Text="{Binding ClientName}"
-                                               FontSize="13" />
-
-                                        <Label Grid.Row="1"
-                                               Grid.Column="1"
-                                               Text="{Binding DateText}"
-                                               Style="{StaticResource Muted}"
-                                               HorizontalTextAlignment="End" />
-
-                                        <Label Grid.Row="2"
-                                               Text="{Binding Phone}"
-                                               Style="{StaticResource Muted}" />
-
-                                        <Label Grid.Row="3"
-                                               Text="{Binding AnimalText}"
-                                               Style="{StaticResource Muted}" />
-
-                                        <Button Grid.Row="3"
-                                                Grid.Column="1"
-                                                Text="Оформить выдачу"
+                                               TextColor="#252525" />
+                                        <Label Text="{Binding ClientName}"
+                                               FontSize="13"
+                                               TextColor="#252525" />
+                                        <Label Text="{Binding Phone}"
+                                               FontSize="12"
+                                               TextColor="#666666" />
+                                        <Label Text="{Binding AnimalText}"
+                                               FontSize="12"
+                                               TextColor="#666666" />
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Text="{Binding DateText}"
+                                                   FontSize="12"
+                                                   TextColor="#666666"
+                                                   VerticalTextAlignment="Center" />
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding Status}"
+                                                   FontSize="12"
+                                                   TextColor="#456C83"
+                                                   VerticalTextAlignment="Center" />
+                                        </Grid>
+                                        <Button Text="Оформить выдачу"
                                                 IsVisible="{Binding CanProcess}"
                                                 Clicked="OnProcessClicked"
                                                 CommandParameter="{Binding .}"
-                                                BackgroundColor="#27AE60"
+                                                BackgroundColor="#456C83"
                                                 TextColor="White"
-                                                CornerRadius="8"
-                                                Padding="12,6" />
-
-                                    </Grid>
+                                                CornerRadius="4"
+                                                HeightRequest="38"
+                                                HorizontalOptions="Start" />
+                                    </VerticalStackLayout>
                                 </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
-
                 </VerticalStackLayout>
             </Border>
-
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

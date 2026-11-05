@@ -4,68 +4,46 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="StudyMauiApp.LoginPage"
     Shell.NavBarIsVisible="False"
-    Title="Login"
-    BackgroundColor="{StaticResource DashboardBackground}">
-    <Grid
-            
-        
-        Padding="30"
-        RowDefinitions="*,auto,*"
-        
-        >
+    Title="Вход"
+    BackgroundColor="#F3F4F4">
+
+    <Grid Padding="20">
         <Border
-            
-            Grid.Row="1"
-            Padding="28"
-            BackgroundColor="Wheat"
-            Stroke="Aqua"
+            BackgroundColor="White"
+            Stroke="#D6D6D6"
             StrokeThickness="1"
-            StrokeShape="RoundRectangle 16"
-            
-            >
+            StrokeShape="RoundRectangle 5"
+            Padding="20"
+            VerticalOptions="Center">
 
-            <VerticalStackLayout Spacing="16">
-                <Label
-                    Text="Приют ля животных "
-                    FontSize="26"
-                    FontAttributes="Bold"
-                    HorizontalTextAlignment="Center"
-                    />
-                <Label
-    Text="Login"
-    FontSize="26"
-    FontAttributes="Bold"
-    HorizontalTextAlignment="Center"
-    />
-                <Entry
-                    
-   x:Name="LoginEntry"
- 
-    HorizontalTextAlignment="Center"
-     ClearButtonVisibility="WhileEditing"/>
-                <Entry
-    x:Name="Pass"
-                    IsPassword="True"
-  
+            <VerticalStackLayout Spacing="14">
+                <Label Text="Приют для животных"
+                       FontSize="23"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TextColor="#252525" />
 
-    HorizontalTextAlignment="Center"
-    ClearButtonVisibility="WhileEditing"
-                    
-                    />
-                <Button
-                        Text="Enter"
-    FontSize="26"
-    FontAttributes="Bold" TextColor="White"
-                    CornerRadius="10"
-                    Clicked="onLoginClicked"
-                    />
-                
+                <Label Text="Вход в систему"
+                       FontSize="15"
+                       HorizontalTextAlignment="Center"
+                       TextColor="#666666" />
 
+                <Entry x:Name="LoginEntry"
+                       Placeholder="Логин"
+                       ClearButtonVisibility="WhileEditing" />
 
+                <Entry x:Name="Pass"
+                       Placeholder="Пароль"
+                       IsPassword="True"
+                       ClearButtonVisibility="WhileEditing" />
+
+                <Button Text="Войти"
+                        Clicked="onLoginClicked"
+                        BackgroundColor="#456C83"
+                        TextColor="White"
+                        CornerRadius="4"
+                        HeightRequest="44" />
             </VerticalStackLayout>
-            
         </Border>
     </Grid>
-
-   
 </ContentPage>

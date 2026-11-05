@@ -13,7 +13,6 @@ public partial class VeterinaryPage : ContentPage
         InitializeComponent();
 
         DateEntry.Text = DateTime.Today.ToString("dd.MM.yyyy");
-
         LoadAnimals();
         ApplyRoleUi();
         LoadRecords();
@@ -31,12 +30,11 @@ public partial class VeterinaryPage : ContentPage
     private void ApplyRoleUi()
     {
         bool isVet = SessionObject.IsVeterenar;
-
         CreateRecordCard.IsVisible = isVet;
 
         PageSubtitle.Text = isVet
-            ? "Фиксация даты, вида медицинской манипуляции и данных о животном."
-            : "Журнал медицинских манипуляций.";
+            ? "Добавление записей о проведённых процедурах."
+            : "Просмотр записей о медицинских процедурах.";
     }
 
     private void LoadAnimals()
@@ -50,13 +48,13 @@ public partial class VeterinaryPage : ContentPage
             var button = new Button
             {
                 Text = animal.DisplayName,
-                BackgroundColor = Color.FromArgb("#F8FAFC"),
-                TextColor = Color.FromArgb("#20252B"),
-                BorderColor = Color.FromArgb("#E0E5EA"),
+                BackgroundColor = Color.FromArgb("#F7F8F8"),
+                TextColor = Color.FromArgb("#252525"),
+                BorderColor = Color.FromArgb("#D6D6D6"),
                 BorderWidth = 1,
-                CornerRadius = 8,
-                HeightRequest = 42,
-                Padding = new Thickness(12, 6)
+                CornerRadius = 4,
+                HeightRequest = 40,
+                Padding = new Thickness(10, 6)
             };
 
             button.Clicked += (_, _) => SelectAnimal(animal, button);
@@ -67,8 +65,8 @@ public partial class VeterinaryPage : ContentPage
         {
             AnimalOptions.Children.Add(new Label
             {
-                Text = "В приюте нет зарегистрированных животных.",
-                TextColor = Color.FromArgb("#69747F"),
+                Text = "В приюте пока нет животных.",
+                TextColor = Color.FromArgb("#666666"),
                 FontSize = 12
             });
         }
@@ -78,11 +76,11 @@ public partial class VeterinaryPage : ContentPage
     {
         foreach (var child in AnimalOptions.Children.OfType<Button>())
         {
-            child.BackgroundColor = Color.FromArgb("#F8FAFC");
-            child.TextColor = Color.FromArgb("#20252B");
+            child.BackgroundColor = Color.FromArgb("#F7F8F8");
+            child.TextColor = Color.FromArgb("#252525");
         }
 
-        selectedButton.BackgroundColor = Color.FromArgb("#2F80ED");
+        selectedButton.BackgroundColor = Color.FromArgb("#456C83");
         selectedButton.TextColor = Colors.White;
 
         _selectedAnimal = animal;
@@ -93,11 +91,8 @@ public partial class VeterinaryPage : ContentPage
     {
         _visibleRecords.Clear();
 
-        foreach (var record in VeterinaryStore.Records
-                     .OrderByDescending(r => r.Date))
-        {
+        foreach (var record in VeterinaryStore.Records.OrderByDescending(r => r.Date))
             _visibleRecords.Add(record);
-        }
 
         RecordsView.ItemsSource = _visibleRecords;
         RecordsCountLabel.Text = $"Всего записей: {_visibleRecords.Count}";
@@ -109,10 +104,7 @@ public partial class VeterinaryPage : ContentPage
 
         if (!SessionObject.IsVeterenar)
         {
-            await DisplayAlert(
-                "Нет доступа",
-                "Медицинские манипуляции может фиксировать ветеринарный врач.",
-                "ОК");
+            await DisplayAlert("Нет доступа", "Добавлять записи может ветеринарный врач.", "ОК");
             return;
         }
 
@@ -128,7 +120,7 @@ public partial class VeterinaryPage : ContentPage
 
         if (string.IsNullOrWhiteSpace(procedure))
         {
-            ValidationLabel.Text = "Укажите вид медицинской манипуляции.";
+            ValidationLabel.Text = "Укажите процедуру.";
             ValidationLabel.IsVisible = true;
             return;
         }
@@ -151,17 +143,13 @@ public partial class VeterinaryPage : ContentPage
                 _selectedAnimal.Number,
                 procedure,
                 date,
-                string.IsNullOrWhiteSpace(notes) ? "Без дополнительных сведений" : notes));
+                string.IsNullOrWhiteSpace(notes) ? "Без примечания" : notes));
 
-        await DisplayAlert(
-            "Готово",
-            $"Запись о манипуляции «{procedure}» для «{_selectedAnimal.Name}» сохранена.",
-            "ОК");
+        await DisplayAlert("Готово", "Запись сохранена.", "ОК");
 
         ProcedureEntry.Text = "";
         NotesEditor.Text = "";
         DateEntry.Text = DateTime.Today.ToString("dd.MM.yyyy");
-
         LoadRecords();
     }
 
