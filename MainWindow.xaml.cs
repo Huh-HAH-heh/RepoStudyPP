@@ -58,8 +58,7 @@ public partial class MainWindow : Window
             : $"{_currentUser.FullName} — {GetRoleName(_currentUser.Role)}";
 
         AccountButton.Content = _currentUser is null ? "Войти" : "Выйти";
-        RequestsNavButton.Visibility = _currentUser is null
-            ? Visibility.Collapsed : Visibility.Visible;
+        RequestsNavButton.Visibility = Visibility.Visible;
         VeterinaryNavButton.Visibility = IsVeterinarian
             ? Visibility.Visible : Visibility.Collapsed;
         ReportsNavButton.Visibility = IsAdmin
@@ -92,13 +91,6 @@ public partial class MainWindow : Window
 
     private void RequestsNav_Click(object sender, RoutedEventArgs e)
     {
-        if (_currentUser is null)
-        {
-            GlobalMessageText.Text = "Сначала войдите в систему.";
-            ShowPage(LoginPage);
-            return;
-        }
-
         RefreshRequestList();
         UpdateRequestFormAccess();
         ShowPage(RequestsPage);
@@ -389,8 +381,16 @@ public partial class MainWindow : Window
 
     private void UpdateRequestFormAccess()
     {
-        bool canCreate = IsClient;
+        bool canCreate = _currentUser is null || IsClient;
         RequestFormCard.Visibility = canCreate ? Visibility.Visible : Visibility.Collapsed;
+        RequestJournalCard.Visibility = _currentUser is null
+            ? Visibility.Collapsed : Visibility.Visible;
+
+        RequestClientNameBox.Text = _currentUser?.FullName ?? "";
+        RequestClientPhoneBox.Text = _currentUser?.Phone ?? "";
+        RequestClientNameBox.IsReadOnly = _currentUser is not null;
+        RequestClientPhoneBox.IsReadOnly = _currentUser is not null;
+
         RequestAnimalBox.ItemsSource = AnimalStore.Animals
             .Where(a => a.Status != "На лечении")
             .ToList();
@@ -425,9 +425,17 @@ public partial class MainWindow : Window
     {
         RequestErrorText.Text = "";
 
-        if (!IsClient || _currentUser is null)
+        if (_currentUser is not null && !IsClient)
         {
-            RequestErrorText.Text = "Заявку может оформить только клиент.";
+            RequestErrorText.Text = "Заявки может оформлять клиент.";
+            return;
+        }
+
+        string clientName = _currentUser?.FullName ?? RequestClientNameBox.Text.Trim();
+        string clientPhone = _currentUser?.Phone ?? RequestClientPhoneBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(clientName) || string.IsNullOrWhiteSpace(clientPhone))
+        {
+            RequestErrorText.Text = "Укажите ФИО и номер телефона.";
             return;
         }
 
@@ -470,8 +478,8 @@ public partial class MainWindow : Window
         RequestStore.Requests.Add(new RequestItem
         {
             Id = id,
-            ClientName = _currentUser.FullName,
-            Phone = _currentUser.Phone,
+            ClientName = clientName,
+            Phone = clientPhone,
             TypeValue = adoption ? RequestType.Adoption : RequestType.Surrender,
             AnimalNumber = animalNumber,
             AnimalName = animalName,

@@ -317,6 +317,10 @@
                     <StackPanel>
                         <TextBlock Text="Новая заявка" FontSize="21" FontWeight="Bold"
                                    Margin="0,0,0,10" />
+                        <TextBlock Text="ФИО клиента" />
+                        <TextBox x:Name="RequestClientNameBox" />
+                        <TextBlock Text="Номер телефона" />
+                        <TextBox x:Name="RequestClientPhoneBox" />
                         <TextBlock Text="Тип заявки" />
                         <ComboBox x:Name="RequestTypeBox" SelectedIndex="0"
                                   SelectionChanged="RequestTypeBox_SelectionChanged">
@@ -344,7 +348,7 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="1" Background="White" BorderBrush="#D6D6D6"
+                <Border x:Name="RequestJournalCard" Grid.Column="1" Background="White" BorderBrush="#D6D6D6"
                         BorderThickness="1" Padding="16">
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Top">
