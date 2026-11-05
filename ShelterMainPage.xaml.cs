@@ -61,8 +61,8 @@ public partial class ShelterMainPage : ContentPage
         WaitingCountLabel.Text = AnimalStore.Animals.Count(a => a.Status == "Ожидает семью").ToString();
     }
 
-    private void OnLoginClicked(object? sender, EventArgs e) =>
-        Shell.Current.GoToAsync("LoginPage");
+    private async void OnLoginClicked(object? sender, EventArgs e) =>
+        await Shell.Current.GoToAsync("LoginPage");
 
     private void OnFilterChanged(object? sender, EventArgs e) => ApplyFilters();
 
