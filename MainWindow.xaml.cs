@@ -16,6 +16,13 @@ public partial class MainWindow : Window
 
         RequestDateBox.Text = DateTime.Today.ToString("dd.MM.yyyy");
         VetDateBox.Text = DateTime.Today.ToString("dd.MM.yyyy");
+        NewAnimalDateBox.Text = DateTime.Today.ToString("dd.MM.yyyy");
+
+        SpeciesFilterBox.ItemsSource = new[] { "Все виды", "Собака", "Кошка", "Другое" };
+        SpeciesFilterBox.SelectedIndex = 0;
+        GenderFilterBox.ItemsSource = new[] { "Любой пол", "Самка", "Самец" };
+        GenderFilterBox.SelectedIndex = 0;
+        UpdateBreedFilter();
 
         RefreshAnimalList();
         RefreshRequestList();
@@ -34,6 +41,7 @@ public partial class MainWindow : Window
         HomePage.Visibility = Visibility.Collapsed;
         ShelterPage.Visibility = Visibility.Collapsed;
         LoginPage.Visibility = Visibility.Collapsed;
+        RegisterPage.Visibility = Visibility.Collapsed;
         AddAnimalPage.Visibility = Visibility.Collapsed;
         RequestsPage.Visibility = Visibility.Collapsed;
         VeterinaryPage.Visibility = Visibility.Collapsed;
@@ -77,6 +85,7 @@ public partial class MainWindow : Window
     private void ShelterNav_Click(object sender, RoutedEventArgs e)
     {
         UpdateStatistics();
+        UpdateBreedFilter();
         RefreshAnimalList();
         ShowPage(ShelterPage);
     }
@@ -130,6 +139,12 @@ public partial class MainWindow : Window
         NewAnimalNameBox.Text = "";
         NewAnimalNumberBox.Text = "";
         NewAnimalBreedBox.Text = "";
+        NewAnimalColorBox.Text = "";
+        NewAnimalAgeBox.Text = "";
+        NewAnimalWeightBox.Text = "";
+        NewAnimalVaccinationsBox.Text = "";
+        NewAnimalPhotoBox.Text = "";
+        NewAnimalDateBox.Text = DateTime.Today.ToString("dd.MM.yyyy");
         AddAnimalErrorText.Text = "";
         ShowPage(AddAnimalPage);
     }
@@ -148,6 +163,65 @@ public partial class MainWindow : Window
         _currentUser = null;
         ApplyRoleAccess();
         ShowPage(HomePage);
+    }
+
+    private void RegisterNav_Click(object sender, RoutedEventArgs e)
+    {
+        RegisterNameBox.Text = "";
+        RegisterPhoneBox.Text = "";
+        RegisterLoginBox.Text = "";
+        RegisterPasswordBox.Password = "";
+        RegisterErrorText.Text = "";
+        RegisterRoleBox.SelectedIndex = 0;
+        ShowPage(RegisterPage);
+    }
+
+    private void LoginNav_Click(object sender, RoutedEventArgs e) =>
+        ShowPage(LoginPage);
+
+    private void RegisterButton_Click(object sender, RoutedEventArgs e)
+    {
+        RegisterErrorText.Text = "";
+        string name = RegisterNameBox.Text.Trim();
+        string phone = RegisterPhoneBox.Text.Trim();
+        string login = RegisterLoginBox.Text.Trim();
+        string password = RegisterPasswordBox.Password;
+        string roleText = (RegisterRoleBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "Client";
+
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(phone)
+            || string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+        {
+            RegisterErrorText.Text = "Заполните все поля.";
+            return;
+        }
+
+        if (UserStore.Users.Any(u => u.Login.Equals(login, StringComparison.OrdinalIgnoreCase)))
+        {
+            RegisterErrorText.Text = "Такой логин уже занят.";
+            return;
+        }
+
+        if (!Enum.TryParse(roleText, out UserRole role))
+        {
+            RegisterErrorText.Text = "Выберите роль.";
+            return;
+        }
+
+        var user = new User
+        {
+            FullName = name,
+            Phone = phone,
+            Login = login,
+            Password = password,
+            Role = role
+        };
+
+        UserStore.Users.Add(user);
+        _currentUser = user;
+        ApplyRoleAccess();
+        ShowPage(ShelterPage);
+        UpdateStatistics();
+        RefreshAnimalList();
     }
 
     private void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -184,14 +258,35 @@ public partial class MainWindow : Window
     private void AnimalSearchBox_TextChanged(object sender, TextChangedEventArgs e) =>
         RefreshAnimalList();
 
+    private void AnimalFilter_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
+        RefreshAnimalList();
+
+    private void UpdateBreedFilter()
+    {
+        string selected = BreedFilterBox?.SelectedItem?.ToString() ?? "Все породы";
+        var breeds = new[] { "Все породы" }.Concat(
+            AnimalStore.Animals.Select(a => a.Breed).Distinct().OrderBy(b => b)).ToList();
+        BreedFilterBox.ItemsSource = breeds;
+        BreedFilterBox.SelectedItem = breeds.Contains(selected) ? selected : "Все породы";
+    }
+
     private void RefreshAnimalList()
     {
+        if (AnimalsList is null)
+            return;
+
         string search = AnimalSearchBox?.Text?.Trim() ?? "";
+        string species = SpeciesFilterBox?.SelectedItem?.ToString() ?? "Все виды";
+        string gender = GenderFilterBox?.SelectedItem?.ToString() ?? "Любой пол";
+        string breed = BreedFilterBox?.SelectedItem?.ToString() ?? "Все породы";
 
         var animals = AnimalStore.Animals
             .Where(a => string.IsNullOrWhiteSpace(search)
                 || a.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
                 || a.Number.Contains(search, StringComparison.OrdinalIgnoreCase))
+            .Where(a => species == "Все виды" || a.Species == species)
+            .Where(a => gender == "Любой пол" || a.Gender == gender)
+            .Where(a => breed == "Все породы" || a.Breed == breed)
             .ToList();
 
         AnimalsList.ItemsSource = animals;
@@ -214,6 +309,8 @@ public partial class MainWindow : Window
             $"Возраст: {animal.Age}\n" +
             $"Вес: {animal.Weight}\n" +
             $"Прививки: {animal.Vaccinations}\n" +
+            $"Фото: {animal.Photo}\n" +
+            $"Дата поступления: {animal.ArrivalDate}\n" +
             $"Статус: {animal.Status}";
     }
 
@@ -233,6 +330,19 @@ public partial class MainWindow : Window
         string gender = (NewAnimalGenderBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Самка";
         string size = (NewAnimalSizeBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Средний";
         string breed = NewAnimalBreedBox.Text.Trim();
+        string color = NewAnimalColorBox.Text.Trim();
+        string age = NewAnimalAgeBox.Text.Trim();
+        string weight = NewAnimalWeightBox.Text.Trim();
+        string vaccinations = NewAnimalVaccinationsBox.Text.Trim();
+        string photo = NewAnimalPhotoBox.Text.Trim();
+        string arrivalDateText = NewAnimalDateBox.Text.Trim();
+
+        if (!DateTime.TryParseExact(arrivalDateText, "dd.MM.yyyy",
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out var arrivalDate))
+        {
+            AddAnimalErrorText.Text = "Введите дату поступления в формате ДД.ММ.ГГГГ.";
+            return;
+        }
 
         if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(number))
         {
@@ -250,10 +360,18 @@ public partial class MainWindow : Window
         AnimalStore.Animals.Add(new AnimalItem(
             name, number, species,
             string.IsNullOrWhiteSpace(breed) ? "Не указана" : breed,
-            gender, "Не указан", size, "Не указан", "Не указан",
-            "Не указаны", "В приюте", "Не прикреплено"));
+            gender,
+            string.IsNullOrWhiteSpace(color) ? "Не указан" : color,
+            size,
+            string.IsNullOrWhiteSpace(age) ? "Не указан" : age,
+            string.IsNullOrWhiteSpace(weight) ? "Не указан" : weight,
+            string.IsNullOrWhiteSpace(vaccinations) ? "Не указаны" : vaccinations,
+            "В приюте",
+            string.IsNullOrWhiteSpace(photo) ? "Не прикреплено" : photo,
+            arrivalDate.ToString("dd.MM.yyyy")));
 
         UpdateStatistics();
+        UpdateBreedFilter();
         RefreshAnimalList();
         ShowPage(ShelterPage);
         GlobalMessageText.Text = $"Животное «{name}» добавлено.";
