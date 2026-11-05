@@ -38,7 +38,7 @@ public sealed record AnimalItem(
     string Photo,
     string ArrivalDate)
 {
-    public string Details => $"{Species} · {Breed} · {Gender} · {Age}";
+    public string Details => $"{Species} · {Breed} · {Gender} · {Age} · {Weight}";
     public string DisplayName => $"{Number} — {Name}";
 }
 
