@@ -1,4 +1,4 @@
-namespace RepoStudyPP;
+namespace RepoStudyPP.Models;
 
 public enum UserRole
 {

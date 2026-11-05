@@ -1,0 +1,29 @@
+<Application x:Class="RepoStudyPP.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <SolidColorBrush x:Key="PageBackground" Color="#F3F4F4" />
+        <SolidColorBrush x:Key="AccentColor" Color="#456C83" />
+        <SolidColorBrush x:Key="TextColor" Color="#252525" />
+        <SolidColorBrush x:Key="MutedColor" Color="#666666" />
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="Margin" Value="3" />
+            <Setter Property="Background" Value="#456C83" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="7,5" />
+            <Setter Property="Margin" Value="0,3,0,8" />
+            <Setter Property="MinHeight" Value="30" />
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Margin" Value="0,3,0,8" />
+            <Setter Property="MinHeight" Value="30" />
+        </Style>
+    </Application.Resources>
+</Application>
